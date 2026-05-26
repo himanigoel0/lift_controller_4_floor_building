@@ -99,7 +99,7 @@ initial begin
     #100; cabin_requests = 4'b0001;   // request ground floor
     #10; cabin_requests = 4'b0000;
     
-    #100;
+    #200;
     
     // ------------------------------------------------------------------------
     // Testing to go at each floor, one by one, through hall requests only (UP)
@@ -158,9 +158,10 @@ initial begin
     // TESTING MULTIPLE CABIN REQUESTS IN SAME DIRECTION (UP)
     // ------------------------------------------------------
     
-    #100; cabin_requests = 4'b1110;   // floor 1,2,3 all requested together.
+    #200; cabin_requests = 4'b1110;   // floor 1,2,3 all requested together.
     #10; cabin_requests = 4'b0000;
-    // lift should go 0 -> 1 -> 2 -> 3 with door open/close at each floor.
+    // We ae currently at first floor.
+    // lift should go 1 -> 2 -> 3 with door open/close at each floor.
     
     // ---------------------------------------------------------
     // TESTING MULTIPLE CABIN REQUESTS IN SAME DIRECTION (DOWN)
@@ -174,17 +175,17 @@ initial begin
     // TESTING MULTIPLE CABIN REQUESTS IN RANDOM DIRECTION
     // ----------------------------------------------------
     
-    #400; cabin_requests = 4'b0100;   // first lets go to 2nd floor.
+    #500; cabin_requests = 4'b0100;   // first lets go to 2nd floor.
     #10; cabin_requests = 4'b0000;
     // when I directly go from gnd floor to 2nd, the lift should not open at the 1st floor.
     
-    #100; cabin_requests = 4'b1111;   
+    #200; cabin_requests = 4'b1111;   
     #10; cabin_requests = 4'b0000;
     // lift should go 2(open) -> 3 -> 2(not open) -> 1 -> 0 with door open/close at each floor.
     // main testing point is that lift should first go to 3rd floor (up) and not down.
     
     
-    #400; cabin_requests = 4'b0010;   // now first lets go to 1st floor.
+    #500; cabin_requests = 4'b0010;   // now first lets go to 1st floor.
     #10; cabin_requests = 4'b0000;
     
     #100; cabin_requests = 4'b1111;   // lets order every floor through cabin requests.
@@ -193,7 +194,7 @@ initial begin
     // main testing point is that lift should first go up and then come down to prevent unnecessary direction changes.
     
     // now lets move up to 2nd floor and then go down to 1st floor, then give requests for all the floors.
-    #400; cabin_requests = 4'b0100;   // now first lets go to 2nd floor.
+    #500; cabin_requests = 4'b0100;   // now first lets go to 2nd floor.
     #10; cabin_requests = 4'b0000;
     
     #100; cabin_requests = 4'b0010;   // Then come down to 1st floor
@@ -205,7 +206,7 @@ initial begin
     // this will prevent direction changes.
     
     // currently I am at third floor due to last condition, let me come to 2nd floor and then give 3rd and 1st floor.
-    #400; cabin_requests = 4'b0100;
+    #500; cabin_requests = 4'b0100;
     #10; cabin_requests  = 4'b0000;
     
     #100; cabin_requests = 4'b1010;
@@ -295,7 +296,7 @@ initial begin
 // -----------------
 // STOP SIMULATION
 // -----------------
-    #1000;
+    #500;
     $finish;
     
 end
