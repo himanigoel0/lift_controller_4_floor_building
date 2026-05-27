@@ -293,10 +293,33 @@ initial begin
     // when I give 2 up and 1 down, it will change its direction to up and hence will go to 2 up first.
     // then, it again reverses its direction to come to 1 down and opens the doors.
     
+    // Now let me come to the 3rd floor and give rst
+    #500; cabin_requests = 4'b1000;
+    #10; cabin_requests = 4'b0000;
+    
+    #200; rst = 1;
+    cabin_requests = 0;
+    hall_requests = 0;
+    emergency_stop = 0;
+    overload_sensor = 0;
+    open_button = 0;
+    close_button = 0;
+    
+    #50; rst = 0;
+    
+    // make the lift move and then assert emergency stop while it is moving.
+    // door should remain/open, movement should not start, and overload output should assert.
+    #200; cabin_requests = 4'b1000;
+    #10; cabin_requests = 4'b0000;
+    
+    #20; emergency_stop = 1;
+    #100; emergency_stop = 0;
+    
+    
 // -----------------
 // STOP SIMULATION
 // -----------------
-    #500;
+    #200;
     $finish;
     
 end
