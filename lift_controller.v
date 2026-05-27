@@ -145,11 +145,14 @@ module lift_controller(
             // If reset, then remain idle wherever we are and flush out all the floor requests
             
             if (rst) begin
-                present_state <= rst_state;
+                if (current_floor == 2'b00) present_state <= door_open_state;
+                else present_state <= rst_state;
                 pending_cabin_requests <= 4'b0000;
                 pending_hall_requests <= 6'b000000;
                 direction <= 0;
                 door_timer <= 0;
+                
+                if (current_floor != 2'b00) current_floor <= current_floor - 1;
 //                current_floor <= 2'b00;
                 // I cant initialise current floor to 0 because if I am at the 3rd floor, 
                 // and rst is activated, then my lift cant teleport immediately from
@@ -162,7 +165,8 @@ module lift_controller(
             else begin
                 present_state <= next_state;
                 
-                if (present_state == rst_state && current_floor != 2'b00) current_floor <= current_floor - 1;
+                if ((present_state == rst_state || next_state == rst_state )&& current_floor != 2'b00) 
+                    current_floor <= current_floor - 1;
                 
                 else if (present_state == move_up_state && next_state == move_up_state && current_floor != 2'b11) begin
                     current_floor <= current_floor + 1;
@@ -191,6 +195,8 @@ module lift_controller(
                 else door_timer <= 0;
             
                 if (present_state == door_open_state && request_current) begin
+                
+                    if (rst && current_floor == 2'b00) next_state = idle_state;
 
                     if (current_floor == 2'b00) begin
                         new_cabin_requests[0] = 0;
@@ -244,13 +250,13 @@ module lift_controller(
         
             next_state = present_state;
             
-            if (rst) next_state = rst_state;
+            if (rst && current_floor != 2'b00) next_state = rst_state;
             else if (emergency_stop) next_state = emergency_state;
             // This will ensure that the door remains open until emergency behaviour is not disabled.
             
             else begin 
                 
-                if (present_state == rst_state) begin
+                if (present_state == rst_state || rst) begin
                     if (current_floor == 2'b00) next_state = idle_state;
                     else next_state = rst_state;
                 end
