@@ -90,15 +90,14 @@ module lift_controller(
                 if (pending_cabin_requests[1] || cabin_requests[1]) request_current = 1;
                 if (pending_hall_requests[1] && (direction == 1)) begin
                     request_current = 1;
-                    request_above = 1;
+//                    request_above = 1;
                 end
                 if (pending_hall_requests[5] && direction == 0) begin
                     request_current = 1;
-                    request_below = 1;
+//                    request_below = 1;
                 end
                 if (hall_requests[1] && direction == 1) request_current = 1;
-                if (hall_requests[5] && direction == 0)
-                    request_current = 1;
+                if (hall_requests[5] && direction == 0) request_current = 1;
                 if (pending_hall_requests[0]) request_below = 1;
                 if (pending_hall_requests[2] || pending_hall_requests[3] || pending_hall_requests[4]) request_above = 1;
                 
@@ -108,14 +107,8 @@ module lift_controller(
                 if (pending_cabin_requests[3]) request_above = 1;
                 if (pending_cabin_requests[0] || pending_cabin_requests[1]) request_below = 1;
                 if (pending_cabin_requests[2] || cabin_requests[2]) request_current = 1;
-                if (pending_hall_requests[2] && direction == 1) begin
-                    request_current = 1;
-                    request_above = 1;
-                end
-                if (pending_hall_requests[4] && direction == 0) begin
-                    request_current = 1;
-                    request_below = 1;
-                end
+                if (pending_hall_requests[2] && direction == 1) request_current = 1;
+                if (pending_hall_requests[4] && direction == 0)request_current = 1;
                 // only for immediate fresh button press
                 if (hall_requests[2] && direction == 1) request_current = 1;
                 if (hall_requests[4] && direction == 0) request_current = 1;
@@ -127,9 +120,7 @@ module lift_controller(
                 request_above = 0;
                 if (pending_cabin_requests[0] || pending_cabin_requests[1] || pending_cabin_requests[2]) request_below = 1;
                 if (pending_cabin_requests[3] || cabin_requests[3]) request_current = 1;
-                if (pending_hall_requests[3] || hall_requests[3]) begin
-                    request_current = 1;
-                end
+                if (pending_hall_requests[3] || hall_requests[3]) request_current = 1;
                 if (pending_hall_requests[0] || pending_hall_requests[1] || pending_hall_requests[2]) request_below = 1;
                 if (pending_hall_requests[4] || pending_hall_requests[5]) request_below = 1;
             end
@@ -168,17 +159,26 @@ module lift_controller(
                 if ((present_state == rst_state || next_state == rst_state )&& current_floor != 2'b00) 
                     current_floor <= current_floor - 1;
                 
+                if (present_state == door_close_state) begin
+                    if (current_floor == 2'b01 && pending_hall_requests[5] && direction == 1 && request_above == 0) direction <= 0;
+                    else if (current_floor == 2'b10 && pending_hall_requests[4] && direction == 1 && request_above == 0) direction <= 0;
+                    else if (current_floor == 2'b01 && pending_hall_requests[1] && direction == 0 && request_below == 0) direction <= 1;
+                    else if (current_floor == 2'b10 && pending_hall_requests[2] && direction == 0 && request_below == 0) direction <= 1;
+                end
+                
                 else if (present_state == move_up_state && next_state == move_up_state && current_floor != 2'b11) begin
                     current_floor <= current_floor + 1;
                     direction <= 1;
                 end
+                // this thing prevents overshoot behaviour (go one floor up further even if we wanted to stop).
+                
                 else if (present_state == move_down_state && next_state == move_down_state && current_floor != 2'b00) begin
                     current_floor <= current_floor - 1;
                     direction <= 0;
                 end
                 // else if (present_state == idle_state) current_floor <= current_floor;
                 
-                // Pending cabin requests is also memory, so we can't assign them in combinational block.
+                // Pending cabin requests is memory only, so we can't assign them in combinational block.
                 new_cabin_requests = pending_cabin_requests | cabin_requests;
                 new_hall_requests = pending_hall_requests | hall_requests;
                 
@@ -186,7 +186,7 @@ module lift_controller(
             
                 /* 
                     Suppose initially we have cabin_requests = 1010, now we also press 2nd floor, so it will
-                   update itself to 1110.
+                   update itself to 1110. (OR logic)
                 */
                 
                 if (present_state == door_open_state && request_current) door_timer <= 0;
@@ -196,7 +196,7 @@ module lift_controller(
             
                 if (present_state == door_open_state && request_current) begin
                 
-                    if (rst && current_floor == 2'b00) next_state = idle_state;
+//                    if (rst && current_floor == 2'b00) next_state = idle_state;
 
                     if (current_floor == 2'b00) begin
                         new_cabin_requests[0] = 0;
@@ -222,6 +222,7 @@ module lift_controller(
                 
                 end
                 
+                // finally updating the memory
                 pending_cabin_requests <= new_cabin_requests;
                 pending_hall_requests <= new_hall_requests;
                     
@@ -249,34 +250,44 @@ module lift_controller(
         always @(*) begin
         
             next_state = present_state;
+            // default behaviour, else latches may form if not assigned anything.
             
             if (rst && current_floor != 2'b00) next_state = rst_state;
             else if (emergency_stop) next_state = emergency_state;
             // This will ensure that the door remains open until emergency behaviour is not disabled.
             
-            else begin 
-                
-                if (present_state == rst_state || rst) begin
-                    if (current_floor == 2'b00) next_state = idle_state;
-                    else next_state = rst_state;
-                end
-                
-                else if (present_state == emergency_state) next_state = door_open_state;
-                else if (overload_sensor) next_state = door_open_state;
-
-                else if (present_state == idle_state) begin
-//                    if (overload_sensor) next_state = door_open_state;
-                    if (open_button) next_state = door_open_state;
-                    else if (request_current) next_state = door_open_state;
-                    else if (request_above) next_state = move_up_state;
-                    else if (request_below) next_state = move_down_state;
-                    else next_state = idle_state; 
-                end
+                else begin 
                     
-                /* first, in if we wrote above because if we did if(below) and else if(above), 
-                   then it would first cover the below requests and not go in the same direction.
-                */
-                // continue in same direction as long as work exists there
+                    if (present_state == rst_state || rst) begin
+                        if (current_floor == 2'b00) next_state = idle_state;
+                        else next_state = rst_state;
+                    end
+                    
+                    else if (present_state == emergency_state) next_state = door_open_state;
+                    else if (overload_sensor) next_state = door_open_state;
+    
+                    else if (present_state == idle_state) begin
+    //                    if (overload_sensor) next_state = door_open_state;
+                        if (open_button) next_state = door_open_state;
+                        else if (close_button) next_state = door_close_state;
+                        else if (request_current) next_state = door_open_state;
+                        else if (direction == 1) begin
+                            if (request_above) next_state = move_up_state;
+                            else if (request_below) next_state = move_down_state;
+                            else next_state = idle_state;
+                        end
+                        else if (direction == 0) begin
+                            if (request_below) next_state = move_down_state;
+                            else if (request_above) next_state = move_up_state;
+                            else next_state = idle_state;
+                        end
+                        else next_state = idle_state; 
+                    end
+                        
+                    /* first, in if we wrote above because if we did if(below) and else if(above), 
+                       then it would first cover the below requests and not go in the same direction.
+                    */
+                    // continue in same direction as long as work exists there
                 
                 // now, we can open door when we move up or down and we encounter any current_requests.
                 else if (present_state == move_up_state) begin
@@ -286,16 +297,24 @@ module lift_controller(
                     else next_state = idle_state;
                 end
                 
+                /* The doors should remain closed while we are moving, and not open in between
+                   The only way for the doors to open while moving is when we get a request_current on 
+                   any floor, then only open the lift, else dont open it. 
+                   Or, to open the doors, we might be presently at the idle state or door close state.*/
+                
                 else if (present_state == move_down_state) begin
                     if (request_current) next_state = door_open_state;
                     else if (request_below) next_state = move_down_state;
                     else if (request_above) next_state = move_up_state;
                     else next_state = idle_state;
                 end        
+                // dont define anything for open button or close button in move up and move down state because 
+                // we dont want doors to open while movement. if no such condition occurs, then it would be default door close only.
                 
                 else if (present_state == door_open_state) begin
 //                    if (overload_sensor) next_state = door_open_state;
                     if (close_button) next_state = door_close_state;
+                    else if (open_button) next_state = door_open_state;
                     else if (door_timer == 3'd7) next_state = door_close_state;
                     else next_state = door_open_state; // jb tb 8 cycles na ho, keep the door open
                     // open the lift for 8 cycles, before it closes. 
@@ -306,7 +325,7 @@ module lift_controller(
 //                    if (pending_cabin_requests[current_floor]) next_state = door_open_state;
 //                    if (overload_sensor) next_state = door_open_state;                    
                     if (open_button) next_state = door_open_state;
-                    else if (close_button) next_state = door_close_state;
+//                    else if (close_button) next_state = door_close_state;
                     // continue upward if already going upward
                     else if (direction == 1 && request_above) next_state = move_up_state;
                    // continue downward if already going downward
@@ -345,7 +364,10 @@ module lift_controller(
                 door_close = 1;
             end
             
+            // Stop all the motion during emergency state and open the doors.
+            // This will lead the lift to open its doors at the nearest floor.
             else if (present_state == emergency_state) begin
+                emergency = 1;
                 idle = 0;
                 move_up = 0;
                 move_down = 0;
@@ -388,14 +410,13 @@ module lift_controller(
             
             if ((present_state == door_open_state || present_state == door_close_state 
             || present_state == idle_state) && overload_sensor) overload = 1;
+            /* the lift should not even start moving if there is overload, the overload could only be 
+               dected when the lift is stationary while people are getting into the lift. once the lift is moving, 
+               there is no point of everload. So, we only keep case for overload while the lift is stationary. */
             
-            else if (present_state == emergency_state) begin
-                emergency = 1;
-                door_open = 1;
-                door_close = 0;
-                move_up = 0;
-                move_down = 0;
-            end
         end
+        
+        // Since the outputs are depending only on the present state, this is a MOORE FSM.
+        // It shows MEALY behaviour only for the overload case, as we havent made a seperate state for it.
         
         endmodule 
