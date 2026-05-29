@@ -70,7 +70,7 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 - **Request Logic:** The request logic determines whether pending requests exist above, below, or at the current floor. These signals are used by the FSM to make scheduling decisions.
 - **Next State Logic:** The next-state logic is the decision-making component of the controller. It evaluates requests, current floor, direction, overload, and emergency conditions to determine the next FSM state.
 - **State Register:** The state register stores the current FSM state and updates on each clock edge. Reset gets the controller to the ground floor, eventually reaching the IDLE state.
-- **Floor Counter:** The floor counter tracks the current floot position of the lift and updates during movement states.
+- **Floor Counter:** The floor counter tracks the current floor position of the lift and updates during movement states.
 - **Door Timer:** The door timer keeps the door open for a fixed number of clock cycles before initiating automatic closure.
 - **Output Logic:** The Moore output logic generates control signals solely based on the current FSM state.
 
