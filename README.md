@@ -54,7 +54,7 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 | move_down_state | Lift moving downward | 7'b0000100 |
 | door_open_state | Door is open for passenger entry/exit | 7'b0001000 |
 | door_close_state | Door is closing before movement | 7'b0010000 |
-| emergency_state | Emergency stop activated | 7'b0100001 |
+| emergency_state | Emergency stop activated | 7'b0100000 |
 | rst_state | Lift halted due to overload condition | 7'b1000000 |
 
 ---
