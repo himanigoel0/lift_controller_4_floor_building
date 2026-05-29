@@ -81,8 +81,8 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 
 ## 9. Simulation Results
 
-Detailed waveform analysis and corner-case verification report:
-[Simulation Report PDF](Working_of_imp_testcases_Lift_controller.pdf)
+Detailed waveform analysis and corner-case verification report for important cases:
+[Working_of_imp_testcases_Lift_controller.pdf](important_corner_testcases/Working_of_imp_testcases_Lift_controller.pdf)
 
 
 ## 10. Conclusion
