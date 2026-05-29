@@ -61,12 +61,20 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 
 ## 6. Block Diagram
 
+**Figure 1: Functional block diagram of the FSM-based Lift Controller.**
 
 ## 7. Functional Description
 - **Pending Request Management:** Cabin and hall requests are stored in dedicated pending request registers. Requests remain active until the corresponding floor is serviced.
 - **Request Logic:** The request logic determines whether pending requests exist above, below, or at the current floor. These signals are used by the FSM to make scheduling decisions.
 - **Next State Logic:** The next-state logic is the decision-making component of the controller. It evaluates requests, current floor, direction, overload, and emergency conditions to determine the next FSM state.
-- **State Register:** The state register stores the current FSM state and updates on each clock edge. Reset initializes the controller to the IDLE state.
-- **Floor Counter:** The floor counter tracks the current position of the lift and updates during movement states.
+- **State Register:** The state register stores the current FSM state and updates on each clock edge. Reset gets the controller to the ground floor, eventually reaching the IDLE state.
+- **Floor Counter:** The floor counter tracks the current floot position of the lift and updates during movement states.
 - **Door Timer:** The door timer keeps the door open for a fixed number of clock cycles before initiating automatic closure.
 - **Output Logic:** The Moore output logic generates control signals solely based on the current FSM state.
+
+## 8. State Transition Summary
+
+**Figure 2: FSM State Transition Diagram.**
+
+## 9. Conclusion
+The Advanced Lift Controller was successfully designed and implemented using Verilog HDL and an FSM-based architecture. The controller correctly handled cabin requests, hall requests, directional scheduling, door operations, overload protection, and emergency conditions. Simulation results verified the correct operation of all major functionalities and demonstrated reliable lift behavior under various operating scenarios.
