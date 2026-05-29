@@ -61,6 +61,8 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 
 ## 6. Block Diagram
 
+![Block Diagram](Block_Diagram_Lift_controller.jpeg)
+
 **Figure 1: Functional block diagram of the FSM-based Lift Controller.**
 
 ## 7. Functional Description
@@ -74,6 +76,7 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 
 ## 8. State Transition Summary
 
+![FSM State Transition Diagram](State_transition_diagram_lift_controller.jpeg)
 **Figure 2: FSM State Transition Diagram.**
 
 
