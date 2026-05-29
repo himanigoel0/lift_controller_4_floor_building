@@ -32,29 +32,29 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 
 | Signal | Description |
 |----------|------------|
+| `idle` | Indicates idle state |
 | `move_up` | Commands lift to move upward |
 | `move_down` | Commands lift to move downward |
 | `door_open` | Opens the lift door |
 | `door_close` | Closes the lift door |
-| `idle` | Indicates idle state |
 | `current_floor[1:0]` | Current floor position |
+| `debug_state[6:0]` | FSM state monitoring output |
 | `direction` | Current travel direction |
 | `overload` | Overload status indication |
 | `emergency` | Emergency status indication |
-| `debug_state[6:0]` | FSM state monitoring output |
 
 ---
 
 ## 5. FSM States
 
-| State | Description |
-|---------|------------|
-| **IDLE** | Waiting for requests |
-| **MOVE_UP** | Lift moving upward |
-| **MOVE_DOWN** | Lift moving downward |
-| **DOOR_OPEN** | Door is open for passenger entry/exit |
-| **DOOR_CLOSE** | Door is closing before movement |
-| **OVERLOAD** | Lift halted due to overload condition |
-| **EMERGENCY** | Emergency stop activated |
+| State | Description | State Encoding |
+|---------|------------|---------------|
+| idle_state | Waiting for requests | 7'b0000001 |
+| move_up_state | Lift moving upward | 7'b0000010 |
+| move_down_state | Lift moving downward | 7'b0000100 |
+| door_open_state | Door is open for passenger entry/exit | 7'b0001000 |
+| door_close_state | Door is closing before movement | 7'b0010000 |
+| emergency_state | Emergency stop activated | 7'b0100001 |
+| rst_state | Lift halted due to overload condition | 7'b1000000 |
 
 ---
