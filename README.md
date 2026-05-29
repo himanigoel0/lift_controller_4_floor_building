@@ -74,16 +74,49 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 - **Door Timer:** The door timer keeps the door open for a fixed number of clock cycles before initiating automatic closure.
 - **Output Logic:** The Moore output logic generates control signals solely based on the current FSM state.
 
-## 8. State Transition Summary
+## 8. State Transition Table
+
+| Present State | Condition / Input | Next State | Description |
+|---------------|------------------|------------|-------------|
+| RESET | `current_floor != 0` | RESET | Continue moving toward ground floor |
+| RESET | `current_floor == 0` | IDLE | Reset complete, enter idle state |
+| IDLE | `request_above = 1` | MOVE_UP | Service requests above current floor |
+| IDLE | `request_below = 1` | MOVE_DOWN | Service requests below current floor |
+| IDLE | `request_current = 1` or `open_button = 1` | DOOR_OPEN | Open door at current floor |
+| IDLE | No pending requests | IDLE | Remain stationary |
+| IDLE | `emergency_stop = 1` | EMERGENCY | Enter emergency state |
+| MOVE_UP | `request_current = 1` or `open_button = 1` | DOOR_OPEN | Stop and open door at requested floor |
+| MOVE_UP | `request_above = 1` | MOVE_UP | Continue upward movement |
+| MOVE_UP | `request_above = 0` and `request_below = 1` | MOVE_DOWN | Reverse direction to serve lower requests |
+| MOVE_UP | No pending requests | IDLE | Return to idle state |
+| MOVE_UP | `emergency_stop = 1` | EMERGENCY | Emergency stop activated |
+| MOVE_DOWN | `request_current = 1` or `open_button = 1` | DOOR_OPEN | Stop and open door at requested floor |
+| MOVE_DOWN | `request_below = 1` | MOVE_DOWN | Continue downward movement |
+| MOVE_DOWN | `request_below = 0` and `request_above = 1` | MOVE_UP | Reverse direction to serve upper requests |
+| MOVE_DOWN | No pending requests | IDLE | Return to idle state |
+| MOVE_DOWN | `emergency_stop = 1` | EMERGENCY | Emergency stop activated |
+| DOOR_OPEN | `overload_sensor = 1` | DOOR_OPEN | Keep door open until overload clears |
+| DOOR_OPEN | `door_timer < 7` | DOOR_OPEN | Maintain door-open interval |
+| DOOR_OPEN | `door_timer == 7` or `close_button = 1` | DOOR_CLOSE | Begin closing door |
+| DOOR_OPEN | `emergency_stop = 1` | EMERGENCY | Emergency stop activated |
+| DOOR_CLOSE | `door_open = 1` | DOOR_OPEN | Re-open door if required |
+| DOOR_CLOSE | `request_above = 1` | MOVE_UP | Continue servicing upward requests |
+| DOOR_CLOSE | `request_below = 1` | MOVE_DOWN | Continue servicing downward requests |
+| DOOR_CLOSE | No pending requests | IDLE | Return to idle state |
+| DOOR_CLOSE | `emergency_stop = 1` | EMERGENCY | Emergency stop activated |
+| EMERGENCY | `emergency_stop = 1` | EMERGENCY | Remain in emergency state |
+| EMERGENCY | `emergency_stop = 0` | IDLE | Resume normal operation |
+
+## 9. State Transition Summary
 
 ![FSM State Transition Diagram](State_transition_diagram_lift_controller.jpeg)
 **Figure 2: FSM State Transition Diagram.**
 
-## 9. Simulation Results
+## 10. Simulation Results
 
 Detailed waveform analysis and corner-case verification report for important cases:
 [Working_of_imp_testcases_Lift_controller.pdf](important_corner_testcases/Working_of_imp_testcases_Lift_controller.pdf)
 
 
-## 10. Conclusion
+## 11. Conclusion
 The Advanced Lift Controller was successfully designed and implemented using Verilog HDL and an FSM-based architecture. The controller correctly handled cabin requests, hall requests, directional scheduling, door operations, overload protection, and emergency conditions. Simulation results verified the correct operation of all major functionalities and demonstrated reliable lift behavior under various operating scenarios.
