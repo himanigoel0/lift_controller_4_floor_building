@@ -1,17 +1,17 @@
-# 1. Project Title
+# Project Title
 Advanced Lift Controller using FSM in Verilog HDL
-# 2. Objective
+## 2. Objective
 The objective of this project is to design and implement an Advanced Lift Controller using a Finite State Machine (FSM) in Verilog HDL. The controller manages lift movement, floor requests, door operations, direction control, overload protection, and emergency handling while ensuring safe and efficient operation.
-# 3. Features
-• Four-floor lift system (Floors 0–3)
-• Cabin request handling
-• Hall request handling (Up/Down)
-• Direction-based scheduling
-• Automatic door opening and closing
-• Emergency stop functionality
-• Overload protection
-• FSM-based control architecture
-• Debug state monitoring
+## 3. Features
+- Four-floor lift system (Floors 0–3)
+- Cabin request handling
+- Hall request handling (Up/Down)
+- Direction-based scheduling
+- Automatic door opening and closing
+- Emergency stop functionality
+- Overload protection
+- FSM-based control architecture
+- Debug state monitoring
 # 4. System Inputs
 Signal	Description
 clk	System clock
