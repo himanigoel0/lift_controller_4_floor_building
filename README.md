@@ -107,7 +107,7 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 | EMERGENCY | `emergency_stop = 1` | EMERGENCY | Remain in emergency state |
 | EMERGENCY | `emergency_stop = 0` | IDLE | Resume normal operation |
 
-- **Assumption:** The overload_sensor detects overload while the lift is open and people are getting into the lift. Hence, no such condition of overload arises when the lift is moving or the doors are closed. So, we only consider overload_sensor input in the door_open state only.
+- **Assumption:** The overload_sensor detects overload while the lift is open and people are getting into the lift. Hence, no such condition of overload arises when the lift is moving or the doors are closed. So, we consider overload_sensor input in the door_open state only.
 
 ## 9. State Transition Summary
 
