@@ -79,6 +79,11 @@ The objective of this project is to design and implement an **Advanced Lift Cont
 ![FSM State Transition Diagram](State_transition_diagram_lift_controller.jpeg)
 **Figure 2: FSM State Transition Diagram.**
 
+## 9. Simulation Results
 
-## 9. Conclusion
+Detailed waveform analysis and corner-case verification report:
+[Simulation Report PDF](Working_of_imp_testcases_Lift_controller.pdf)
+
+
+## 10. Conclusion
 The Advanced Lift Controller was successfully designed and implemented using Verilog HDL and an FSM-based architecture. The controller correctly handled cabin requests, hall requests, directional scheduling, door operations, overload protection, and emergency conditions. Simulation results verified the correct operation of all major functionalities and demonstrated reliable lift behavior under various operating scenarios.
